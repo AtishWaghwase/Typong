@@ -51,24 +51,26 @@ function giveSpeed(ball) {
 }
 
 function checkCollision(ball) {
-  if (ball.x - SIZE / 2 < 0 || ball.x + SIZE / 2 > width) {
+  if (ball.x - BALL_RADIUS < 0 || ball.x + BALL_RADIUS > width) {
     ball.xSpeed = -ball.xSpeed;
   }
 
-  if (ball.y - SIZE / 2 < 0 || ball.y + SIZE / 2 > height) {
+  if (ball.y - BALL_RADIUS < 0 || ball.y + BALL_RADIUS > height) {
     ball.ySpeed = -ball.ySpeed;
   }
 }
 
-function checkCornerCollision(brick, x, y, width, height, ball) {
+function checkCornerCollision(x, y, width, ball) {
+  // console.log(`${y - BALL_RADIUS}, ${ball.y}`);
+  if (ball.y + BALL_RADIUS > y && ball.x > x && ball.x < x + width) {
+    console.log("triggered");
+    ball.ySpeed = -ball.ySpeed;
+  }
   let corners = [
     { x: x, y: y },
     { x: x + width, y: y },
-    // { x: x + width, y: y + height },
-    // { x: x, y: y + height },
   ];
   corners.forEach((corner) => {
-    circle(corner.x, corner.y, 10);
     let dx = corner.x - ball.x;
     let dy = corner.y - ball.y;
     let distance = sqrt(dx * dx + dy * dy);
@@ -79,9 +81,6 @@ function checkCornerCollision(brick, x, y, width, height, ball) {
       let dot = ball.xSpeed * normalX + ball.ySpeed * normalY;
       ball.xSpeed -= 2 * dot * normalX;
       ball.ySpeed -= 2 * dot * normalY;
-      console.log(
-        `Corner collision at brick ${brick.index} corner.x ${corner.x}, ball.x${ball.x}, corner.y ${corner.y}, ball.y${ball.y},`
-      );
     }
   });
 }
@@ -113,6 +112,7 @@ sketch.setup = function () {
   bricks.push(newBrick);
   newBrick = brickFactory.createBrick(11, true, "AFTER");
   bricks.push(newBrick);
+
   console.log(bricks);
 
   x = width / 2;
@@ -138,7 +138,7 @@ sketch.draw = function () {
     rect(x, y, brickWidth, BRICK_HEIGHT);
     centeredText(brick, x, y, brickWidth);
     balls.forEach((ball) => {
-      checkCornerCollision(brick, x, y, brickWidth, BRICK_HEIGHT, ball);
+      checkCornerCollision(x, y, brickWidth, ball);
     });
   });
 };
