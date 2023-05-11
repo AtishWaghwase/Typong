@@ -113,29 +113,30 @@ sketch.setup = function () {
 
   let factory = new BallFactory();
   let newBall = factory.createBall(width / 2, height / 2, 0, ySpeed);
+  let words = generateRandomWords(TOTAL_BRICKS, 5);
   balls.push(newBall);
 
-  for (let brick = 0; brick < TOTAL_BRICKS; brick++) {
+  for (let index = 0; index < TOTAL_BRICKS; index++) {
     const brickFactory = new BrickFactory();
-    bricks.push(brickFactory.createBrick(brick, true, `Word ${brick}`));
+    bricks.push(brickFactory.createBrick(index, true, `${words[index]}`));
   }
 
-  x = width / 2;
-  y = height / 2;
+  // // x = width / 2;
+  // // y = height / 2;
 
-  let dictionary = generateRandomWords(TOTAL_BRICKS, 5);
-  console.log(dictionary);
-  dictionary.pop();
-  dictionary.pop();
-  dictionary.pop();
-  dictionary.pop();
-  dictionary.pop();
-  dictionary.push(generateRandomWords(1, 5)[0]);
-  dictionary.push(generateRandomWords(1, 5)[0]);
-  dictionary.push(generateRandomWords(1, 5)[0]);
-  dictionary.push(generateRandomWords(1, 5)[0]);
-  dictionary.push(generateRandomWords(1, 5)[0]);
-  console.log(dictionary);
+  // let dictionary = generateRandomWords(TOTAL_BRICKS, 5);
+  // console.log(dictionary);
+  // dictionary.pop();
+  // dictionary.pop();
+  // dictionary.pop();
+  // dictionary.pop();
+  // dictionary.pop();
+  // dictionary.push(generateRandomWords(1, 5)[0]);
+  // dictionary.push(generateRandomWords(1, 5)[0]);
+  // dictionary.push(generateRandomWords(1, 5)[0]);
+  // dictionary.push(generateRandomWords(1, 5)[0]);
+  // dictionary.push(generateRandomWords(1, 5)[0]);
+  // console.log(dictionary);
 };
 
 sketch.draw = function () {
