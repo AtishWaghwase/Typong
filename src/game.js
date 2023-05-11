@@ -1,7 +1,8 @@
 import "../css/style.css";
-import { p5, sketch } from "p5js-wrapper";
+import { sketch } from "p5js-wrapper";
+import randomWords from "random-words";
 
-let x, y, ballOne;
+let x, y;
 let currentText = "";
 
 const SIZE = 50;
@@ -14,6 +15,7 @@ let xSpeed = Math.random() * 3 + 2;
 
 let balls = [];
 let bricks = [];
+let dictionary = [];
 
 function BallFactory() {
   this.createBall = function (x, y, xSpeed, ySpeed) {
@@ -37,7 +39,7 @@ function BrickFactory() {
 }
 
 function centeredText(brick, x, y, brickWidth) {
-  let txtSize = brickWidth / 4;
+  let txtSize = brickWidth / 5;
   let txtWidth = textWidth(brick.word);
   let txtX = x + (brickWidth - txtWidth) / 2;
   let txtY = y + (BRICK_HEIGHT + txtSize) / 2;
@@ -66,9 +68,7 @@ function checkBrickCollision(x, y, brick, width, ball) {
     if (ball.y + BALL_RADIUS > y && ball.x > x && ball.x < x + width) {
       console.log("triggered");
       ball.ySpeed = -ball.ySpeed;
-      console.log(brick.solid);
       brick.solid = false;
-      console.log(brick.solid);
     }
     let corners = [
       { x: x, y: y },
@@ -86,12 +86,25 @@ function checkBrickCollision(x, y, brick, width, ball) {
         ball.xSpeed -= 2 * dot * normalX;
         ball.ySpeed -= 2 * dot * normalY;
 
-        console.log(brick.solid);
         brick.solid = false;
-        console.log(brick.solid);
       }
     });
   }
+}
+
+function generateRandomWords(n, length) {
+  let words = [];
+  while (words.length < n) {
+    let newWords = randomWords({ exactly: n - words.length });
+    newWords = newWords.filter(
+      (word) =>
+        word.length === length &&
+        !words.includes(word) &&
+        !dictionary.includes(word)
+    );
+    words.push(...newWords);
+  }
+  return words.map((word) => word.toUpperCase());
 }
 
 sketch.setup = function () {
@@ -101,39 +114,28 @@ sketch.setup = function () {
   let factory = new BallFactory();
   let newBall = factory.createBall(width / 2, height / 2, 0, ySpeed);
   balls.push(newBall);
-  // console.log(balls);
 
-  let brickFactory = new BrickFactory();
-  let newBrick = brickFactory.createBrick(1, true, "AGAIN");
-  bricks.push(newBrick);
-  newBrick = brickFactory.createBrick(3, true, "AGILE");
-  bricks.push(newBrick);
-  newBrick = brickFactory.createBrick(4, true, "AGILE");
-  bricks.push(newBrick);
-  newBrick = brickFactory.createBrick(5, true, "AFTER");
-  bricks.push(newBrick);
-  newBrick = brickFactory.createBrick(7, true, "AFTER");
-  bricks.push(newBrick);
-  newBrick = brickFactory.createBrick(9, true, "AFTER");
-  bricks.push(newBrick);
-  newBrick = brickFactory.createBrick(11, true, "AFTER");
-  bricks.push(newBrick);
-
-  console.log(bricks);
+  for (let brick = 0; brick < TOTAL_BRICKS; brick++) {
+    const brickFactory = new BrickFactory();
+    bricks.push(brickFactory.createBrick(brick, true, `Word ${brick}`));
+  }
 
   x = width / 2;
   y = height / 2;
-};
 
-sketch.keyPressed = function () {
-  if (keyCode === BACKSPACE) {
-    currentText = currentText.slice(0, -1);
-  } else if (currentText.length >= 4) {
-    // clear currentText
-    currentText = "";
-  } else if (key.length === 1) {
-    currentText += key;
-  }
+  let dictionary = generateRandomWords(TOTAL_BRICKS, 5);
+  console.log(dictionary);
+  dictionary.pop();
+  dictionary.pop();
+  dictionary.pop();
+  dictionary.pop();
+  dictionary.pop();
+  dictionary.push(generateRandomWords(1, 5)[0]);
+  dictionary.push(generateRandomWords(1, 5)[0]);
+  dictionary.push(generateRandomWords(1, 5)[0]);
+  dictionary.push(generateRandomWords(1, 5)[0]);
+  dictionary.push(generateRandomWords(1, 5)[0]);
+  console.log(dictionary);
 };
 
 sketch.draw = function () {
@@ -151,7 +153,6 @@ sketch.draw = function () {
     const brickWidth = width / TOTAL_BRICKS;
     const x = brickWidth * brick.index;
     const y = (displayHeight * 3) / 4 - BRICK_HEIGHT;
-    console.log(`Index: ${brick.index}, State: ${brick.solid}`);
     fill(0, 255, 0);
     rect(x, y, brickWidth, BRICK_HEIGHT);
     centeredText(brick, x, y, brickWidth);
@@ -162,6 +163,17 @@ sketch.draw = function () {
 
   fill(255);
   text(currentText, 20, height - 10);
+};
+
+sketch.keyPressed = function () {
+  if (keyCode === BACKSPACE) {
+    currentText = currentText.slice(0, -1);
+  } else if (currentText.length >= 4) {
+    // clear currentText
+    currentText = "";
+  } else if (key.length === 1) {
+    currentText += key;
+  }
 };
 
 sketch.mousePressed = function () {
