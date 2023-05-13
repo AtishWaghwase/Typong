@@ -2,7 +2,6 @@ import "../css/style.css";
 import { sketch } from "p5js-wrapper";
 import randomWords from "random-words";
 
-let x, y;
 let currentText = "";
 
 const SIZE = 50;
@@ -15,7 +14,7 @@ let xSpeed = Math.random() * 3 + 2;
 
 let balls = [];
 let bricks = [];
-let dictionary = [];
+let words = [];
 
 function BallFactory() {
   this.createBall = function (x, y, xSpeed, ySpeed) {
@@ -38,12 +37,12 @@ function BrickFactory() {
   };
 }
 
-function centeredText(brick, x, y, brickWidth) {
+function brickText(brick, x, y, brickWidth) {
   let txtSize = brickWidth / 5;
   let txtWidth = textWidth(brick.word);
   let txtX = x + (brickWidth - txtWidth) / 2;
   let txtY = y + (BRICK_HEIGHT + txtSize) / 2;
-  fill(0);
+  fill(255);
   textSize(txtSize);
   text(brick.word, txtX, txtY);
 }
@@ -51,6 +50,19 @@ function centeredText(brick, x, y, brickWidth) {
 function giveSpeed(ball) {
   ball.x = ball.x + ball.xSpeed;
   ball.y = ball.y + ball.ySpeed;
+}
+
+function checkWord(string) {
+  return words.some((word) => word === string);
+}
+
+function activateBrick(string) {
+  bricks.map((brick) => {
+    if (brick.word === string) {
+      console.log(`Brick ${brick.word} set to true`);
+      brick.solid = true;
+    }
+  });
 }
 
 function checkBorderCollision(ball) {
@@ -66,7 +78,7 @@ function checkBorderCollision(ball) {
 function checkBrickCollision(x, y, brick, width, ball) {
   if (brick.solid) {
     if (ball.y + BALL_RADIUS > y && ball.x > x && ball.x < x + width) {
-      console.log("triggered");
+      console.log("Collision");
       ball.ySpeed = -ball.ySpeed;
       brick.solid = false;
     }
@@ -98,9 +110,7 @@ function generateRandomWords(n, length) {
     let newWords = randomWords({ exactly: n - words.length });
     newWords = newWords.filter(
       (word) =>
-        word.length === length &&
-        !words.includes(word) &&
-        !dictionary.includes(word)
+        word.length === length && !words.includes(word) && !words.includes(word)
     );
     words.push(...newWords);
   }
@@ -108,35 +118,19 @@ function generateRandomWords(n, length) {
 }
 
 sketch.setup = function () {
-  // createCanvas(displayWidth, displayHeight);
   createCanvas((displayWidth * 3) / 4, (displayHeight * 3) / 4);
 
   let factory = new BallFactory();
   let newBall = factory.createBall(width / 2, height / 2, 0, ySpeed);
-  let words = generateRandomWords(TOTAL_BRICKS, 5);
+  words = generateRandomWords(TOTAL_BRICKS, 5);
   balls.push(newBall);
 
   for (let index = 0; index < TOTAL_BRICKS; index++) {
     const brickFactory = new BrickFactory();
-    bricks.push(brickFactory.createBrick(index, true, `${words[index]}`));
+    bricks.push(brickFactory.createBrick(index, false, `${words[index]}`));
   }
 
-  // // x = width / 2;
-  // // y = height / 2;
-
-  // let dictionary = generateRandomWords(TOTAL_BRICKS, 5);
-  // console.log(dictionary);
-  // dictionary.pop();
-  // dictionary.pop();
-  // dictionary.pop();
-  // dictionary.pop();
-  // dictionary.pop();
-  // dictionary.push(generateRandomWords(1, 5)[0]);
-  // dictionary.push(generateRandomWords(1, 5)[0]);
-  // dictionary.push(generateRandomWords(1, 5)[0]);
-  // dictionary.push(generateRandomWords(1, 5)[0]);
-  // dictionary.push(generateRandomWords(1, 5)[0]);
-  // console.log(dictionary);
+  console.log(words);
 };
 
 sketch.draw = function () {
@@ -154,26 +148,36 @@ sketch.draw = function () {
     const brickWidth = width / TOTAL_BRICKS;
     const x = brickWidth * brick.index;
     const y = (displayHeight * 3) / 4 - BRICK_HEIGHT;
-    fill(0, 255, 0);
+    if (brick.solid) {
+      fill(0, 255, 0);
+    } else {
+      fill(0, 0, 50);
+    }
+    // fill(0, 255, 0);
     rect(x, y, brickWidth, BRICK_HEIGHT);
-    centeredText(brick, x, y, brickWidth);
+    brickText(brick, x, y, brickWidth);
     balls.forEach((ball) => {
       checkBrickCollision(x, y, brick, brickWidth, ball);
     });
   });
 
   fill(255);
-  text(currentText, 20, height - 10);
+  text(currentText, 20, 30);
 };
 
 sketch.keyPressed = function () {
   if (keyCode === BACKSPACE) {
     currentText = currentText.slice(0, -1);
+  } else if (keyCode === 32) {
+    // Ignore spaces
   } else if (currentText.length >= 4) {
-    // clear currentText
+    currentText += key.toUpperCase();
+    if (checkWord(currentText)) {
+      activateBrick(currentText);
+    }
     currentText = "";
   } else if (key.length === 1) {
-    currentText += key;
+    currentText += key.toUpperCase();
   }
 };
 
