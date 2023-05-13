@@ -2,21 +2,30 @@ import "../css/style.css";
 import { sketch } from "p5js-wrapper";
 import randomWords from "random-words";
 
-let currentText = "";
-let collisionCounter = 0;
+let scoreHeight, brickHeight;
+let ySpeed = 5;
+let xSpeed = Math.random() * 3;
 
-const SIZE = 50;
 const BALL_RADIUS = 25;
-const BRICK_HEIGHT = 30;
 const TOTAL_BRICKS = 15;
 const SPAWN_THRESHOLD = 3;
 
-let ySpeed = 5;
-let xSpeed = Math.random() * 3;
+const SCORE_Y = 22 / 24;
+const SCORE_HEIGHT = 2 / 24;
+const BRICK_HEIGHT_TEMP = 1 / 24;
+const ASPECT_RATIO = 9 / 16;
+const SPEED_REDUCER = 1.5;
 
 let balls = [];
 let bricks = [];
 let dictionary = [];
+
+let game = {
+  running: true,
+  input: "",
+  collisionCounter: 0,
+  scoreCounter: 0,
+};
 
 function BallFactory() {
   this.createBall = function (x, y, xSpeed, ySpeed) {
@@ -42,24 +51,30 @@ function BrickFactory() {
 function drawBall(ball) {
   fill(255, 0, 0);
   noStroke();
-  circle(ball.x, ball.y, SIZE);
+  circle(ball.x, ball.y, BALL_RADIUS * 2);
 }
 
 function drawCurrentText() {
   fill(200);
   textSize(100);
-  text(currentText, 400, 400);
+  text(game.input, 400, 400);
   textSize(15);
 }
 
-function brickText(brick, x, y, brickWidth) {
+function brickText(brick, x, y, brickWidth, brickHeight) {
   let txtSize = brickWidth / 5;
   let txtWidth = textWidth(brick.word);
   let txtX = x + (brickWidth - txtWidth) / 2;
-  let txtY = y + (BRICK_HEIGHT + txtSize) / 2;
+  let txtY = y + (brickHeight + txtSize) / 2;
   fill(255);
   textSize(txtSize);
   text(brick.word, txtX, txtY);
+}
+
+function drawScore(w, h, scoreHeight) {
+  // let y = h * SCORE_Y;
+  fill(100, 50, 50);
+  rect(0, 0, w, scoreHeight);
 }
 
 function giveSpeed(ball) {
@@ -80,12 +95,15 @@ function activateBrick(string) {
   });
 }
 
-function checkBorderCollision(ball) {
+function checkBorderCollision(ball, scoreHeight, brickHeight) {
   if (ball.x - BALL_RADIUS < 0 || ball.x + BALL_RADIUS > width) {
     ball.xSpeed = -ball.xSpeed;
   }
 
-  if (ball.y - BALL_RADIUS < 0 || ball.y + BALL_RADIUS > height) {
+  if (
+    ball.y - scoreHeight - BALL_RADIUS < 0 ||
+    ball.y + BALL_RADIUS > height - brickHeight + BALL_RADIUS * 2
+  ) {
     ball.ySpeed = -ball.ySpeed;
   }
 }
@@ -97,42 +115,25 @@ function checkBrickCollision(x, y, brick, width, ball) {
   if (ball.y + BALL_RADIUS > y && ball.x > x && ball.x < x + width) {
     ball.ySpeed = -ball.ySpeed;
 
-    collisionCounter += 1;
+    game.collisionCounter += 1;
+    game.scoreCounter += 1;
     console.log("Collision");
-    console.log(collisionCounter);
+    console.log(game.collisionCounter);
+    console.log(game.scoreCounter);
 
     replaceWord(brick);
 
     brick.solid = false;
   }
-  // let corners = [
-  //   { x: x, y: y },
-  //   { x: x + width, y: y },
-  // ];
-  // corners.forEach((corner) => {
-  //   let dx = corner.x - ball.x;
-  //   let dy = corner.y - ball.y;
-  //   let distance = sqrt(dx * dx + dy * dy);
-  //   if (distance < BALL_RADIUS) {
-  //     let angle = atan2(dy, dx);
-  //     let normalX = cos(angle);
-  //     let normalY = sin(angle);
-  //     let dot = ball.xSpeed * normalX + ball.ySpeed * normalY;
-  //     ball.xSpeed -= 2 * dot * normalX;
-  //     ball.ySpeed -= 2 * dot * normalY;
-
-  //     brick.solid = false;
-  //   }
-  // });
 }
 
-function generateRandomWords(n, length) {
+function generateRandomWords(n) {
   let words = [];
   while (words.length < n) {
     let newWords = randomWords({ exactly: n - words.length });
     newWords = newWords.filter(
       (word) =>
-        word.length === length && !words.includes(word) && !words.includes(word)
+        word.length === 5 && !words.includes(word) && !words.includes(word)
     );
     words.push(...newWords);
   }
@@ -140,20 +141,35 @@ function generateRandomWords(n, length) {
 }
 
 function replaceWord(brick) {
-  let newWord = generateRandomWords(1, 5)[0];
+  let newWord = generateRandomWords(1)[0];
   while (dictionary.some((word) => word === newWord)) {
-    newWord = generateRandomWords(1, 5)[0];
+    newWord = generateRandomWords(1)[0];
   }
   brick.word = newWord;
   dictionary[brick.index] = brick.word;
   console.log(`Brick ${brick.index} is now ${dictionary[brick.index]}`);
 }
 
+function randomBool() {
+  let seed = Math.random();
+  if (seed > 0.5) return true;
+  else return false;
+}
+
+function randomSpeed(max) {
+  return Math.random() * max;
+}
+
 function spawnBall() {
   let factory = new BallFactory();
-  let newBall = factory.createBall(width / 2, height / 2, xSpeed, -ySpeed);
+  let newBall = factory.createBall(
+    width / 2,
+    height / 2,
+    randomSpeed(3),
+    -ySpeed
+  );
   balls.push(newBall);
-  collisionCounter = 0;
+  game.collisionCounter = 0;
 }
 
 function reduceSpeed() {
@@ -161,79 +177,95 @@ function reduceSpeed() {
     if (Math.abs(ball.ySpeed) < 1) {
       console.log("too slow");
     } else {
-      ball.ySpeed /= 2;
+      ball.ySpeed /= SPEED_REDUCER;
       console.log(ball.ySpeed);
     }
   });
 }
 
 sketch.setup = function () {
-  createCanvas((displayWidth * 3) / 4, (displayWidth * 3) / 5.5);
+  const w = displayHeight;
+  const h = displayHeight * ASPECT_RATIO;
+  createCanvas(w, h);
 
   let factory = new BallFactory();
   let newBall = factory.createBall(width / 2, height / 2, 0, -ySpeed);
   balls.push(newBall);
 
-  dictionary = generateRandomWords(TOTAL_BRICKS, 5);
+  dictionary = generateRandomWords(TOTAL_BRICKS);
 
   for (let index = 0; index < TOTAL_BRICKS; index++) {
     const brickFactory = new BrickFactory();
-    bricks.push(brickFactory.createBrick(index, false, `${dictionary[index]}`));
+    bricks.push(brickFactory.createBrick(index, true, `${dictionary[index]}`));
   }
 
   console.log(dictionary);
 };
 
 sketch.draw = function () {
+  const w = displayHeight;
+  const h = displayHeight * ASPECT_RATIO;
+  scoreHeight = h * SCORE_HEIGHT;
+  brickHeight = h * BRICK_HEIGHT_TEMP;
+
   background(0, 0, 50);
   drawCurrentText();
 
-  balls.forEach((ball) => {
-    drawBall(ball);
-    giveSpeed(ball);
-    checkBorderCollision(ball);
-  });
-
-  bricks.forEach((brick) => {
-    const brickWidth = width / TOTAL_BRICKS;
-    const x = brickWidth * brick.index;
-    const y = (displayHeight * 3) / 4 - BRICK_HEIGHT;
-    if (brick.solid) {
-      fill(0, 255, 0);
-    } else {
-      fill(0, 0, 50);
-    }
-    rect(x, y, brickWidth, BRICK_HEIGHT);
-    fill(255);
-    brickText(brick, x, y, brickWidth);
+  if (game.running) {
     balls.forEach((ball) => {
-      checkBrickCollision(x, y, brick, brickWidth, ball);
+      drawBall(ball);
+      giveSpeed(ball);
+      checkBorderCollision(ball, scoreHeight, brickHeight);
     });
-  });
 
-  if (collisionCounter >= SPAWN_THRESHOLD) {
-    spawnBall();
-    reduceSpeed();
-    console.log(balls);
+    bricks.forEach((brick) => {
+      const brickWidth = w / TOTAL_BRICKS;
+      const x = brickWidth * brick.index;
+      const y = h - brickHeight;
+      if (brick.solid) {
+        fill(0, 255, 0);
+      } else {
+        fill(0, 0, 50);
+      }
+      rect(x, y, brickWidth, brickHeight);
+      fill(255);
+      brickText(brick, x, y, brickWidth, brickHeight);
+      balls.forEach((ball) => {
+        checkBrickCollision(x, y, brick, brickWidth, ball);
+      });
+    });
+
+    drawScore(w, h, scoreHeight);
+
+    if (game.collisionCounter >= SPAWN_THRESHOLD) {
+      spawnBall();
+      reduceSpeed();
+      console.log(balls);
+    }
   }
 };
 
 sketch.keyPressed = function () {
   if (keyCode === BACKSPACE) {
-    currentText = currentText.slice(0, -1);
+    game.input = game.input.slice(0, -1);
   } else if (keyCode === 32) {
     // Ignore spaces
-  } else if (currentText.length >= 4) {
-    currentText += key.toUpperCase();
-    if (checkWord(currentText)) {
-      activateBrick(currentText);
+  } else if (game.input.length >= 4) {
+    game.input += key.toUpperCase();
+    if (checkWord(game.input)) {
+      activateBrick(game.input);
     }
-    currentText = "";
+    game.input = "";
   } else if (key.length === 1) {
-    currentText += key.toUpperCase();
+    game.input += key.toUpperCase();
   }
 };
 
 sketch.mousePressed = function () {
-  console.log("here");
+  if (game.running) {
+    game.running = false;
+  } else {
+    game.running = true;
+  }
+  console.log(game.running);
 };
