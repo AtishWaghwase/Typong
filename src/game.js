@@ -105,6 +105,25 @@ function checkBrickCollision(x, y, brick, width, ball) {
 
     brick.solid = false;
   }
+  // let corners = [
+  //   { x: x, y: y },
+  //   { x: x + width, y: y },
+  // ];
+  // corners.forEach((corner) => {
+  //   let dx = corner.x - ball.x;
+  //   let dy = corner.y - ball.y;
+  //   let distance = sqrt(dx * dx + dy * dy);
+  //   if (distance < BALL_RADIUS) {
+  //     let angle = atan2(dy, dx);
+  //     let normalX = cos(angle);
+  //     let normalY = sin(angle);
+  //     let dot = ball.xSpeed * normalX + ball.ySpeed * normalY;
+  //     ball.xSpeed -= 2 * dot * normalX;
+  //     ball.ySpeed -= 2 * dot * normalY;
+
+  //     brick.solid = false;
+  //   }
+  // });
 }
 
 function generateRandomWords(n, length) {
