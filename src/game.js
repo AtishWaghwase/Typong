@@ -3,6 +3,7 @@ import { sketch } from "p5js-wrapper";
 import randomWords from "random-words";
 
 let currentText = "";
+let collisionCounter = 0;
 
 const SIZE = 50;
 const BALL_RADIUS = 25;
@@ -23,6 +24,7 @@ function BallFactory() {
     ball.y = y;
     ball.xSpeed = xSpeed;
     ball.ySpeed = ySpeed;
+    ball.collisions = 0;
     return ball;
   };
 }
@@ -95,6 +97,9 @@ function checkBrickCollision(x, y, brick, width, ball) {
   if (ball.y + BALL_RADIUS > y && ball.x > x && ball.x < x + width) {
     ball.ySpeed = -ball.ySpeed;
     console.log("Collision");
+    ball.collisions += 1;
+
+    console.log(ball.collisions);
 
     replaceWord(brick);
 
@@ -137,9 +142,13 @@ sketch.setup = function () {
   console.log(dictionary);
 };
 
+function createBalls() {
+  if (collisionCounter >= 5) {
+  }
+}
+
 sketch.draw = function () {
   background(0, 0, 50);
-
   drawCurrentText();
 
   balls.forEach((ball) => {
@@ -180,6 +189,8 @@ sketch.keyPressed = function () {
   } else if (key.length === 1) {
     currentText += key.toUpperCase();
   }
+
+  createBalls();
 };
 
 sketch.mousePressed = function () {
