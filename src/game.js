@@ -3,6 +3,7 @@ import { sketch } from "p5js-wrapper";
 import randomWords from "random-words";
 
 let currentText = "";
+let lastText = "";
 
 const SIZE = 50;
 const BALL_RADIUS = 25;
@@ -14,7 +15,7 @@ let xSpeed = Math.random() * 3 + 2;
 
 let balls = [];
 let bricks = [];
-let words = [];
+let dictionary = [];
 
 function BallFactory() {
   this.createBall = function (x, y, xSpeed, ySpeed) {
@@ -37,6 +38,19 @@ function BrickFactory() {
   };
 }
 
+function drawBall(ball) {
+  fill(255, 0, 0);
+  noStroke();
+  circle(ball.x, ball.y, SIZE);
+}
+
+function drawCurrentText() {
+  fill(200);
+  textSize(100);
+  text(currentText, 400, 400);
+  textSize(15);
+}
+
 function brickText(brick, x, y, brickWidth) {
   let txtSize = brickWidth / 5;
   let txtWidth = textWidth(brick.word);
@@ -53,7 +67,7 @@ function giveSpeed(ball) {
 }
 
 function checkWord(string) {
-  return words.some((word) => word === string);
+  return dictionary.some((word) => word === string);
 }
 
 function activateBrick(string) {
@@ -76,32 +90,36 @@ function checkBorderCollision(ball) {
 }
 
 function checkBrickCollision(x, y, brick, width, ball) {
-  if (brick.solid) {
-    if (ball.y + BALL_RADIUS > y && ball.x > x && ball.x < x + width) {
-      console.log("Collision");
-      ball.ySpeed = -ball.ySpeed;
-      brick.solid = false;
-    }
-    let corners = [
-      { x: x, y: y },
-      { x: x + width, y: y },
-    ];
-    corners.forEach((corner) => {
-      let dx = corner.x - ball.x;
-      let dy = corner.y - ball.y;
-      let distance = sqrt(dx * dx + dy * dy);
-      if (distance < BALL_RADIUS) {
-        let angle = atan2(dy, dx);
-        let normalX = cos(angle);
-        let normalY = sin(angle);
-        let dot = ball.xSpeed * normalX + ball.ySpeed * normalY;
-        ball.xSpeed -= 2 * dot * normalX;
-        ball.ySpeed -= 2 * dot * normalY;
-
-        brick.solid = false;
-      }
-    });
+  if (!brick.solid) {
+    return;
   }
+  if (ball.y + BALL_RADIUS > y && ball.x > x && ball.x < x + width) {
+    ball.ySpeed = -ball.ySpeed;
+    console.log("Collision");
+
+    replaceWord(brick);
+
+    brick.solid = false;
+  }
+  // let corners = [
+  //   { x: x, y: y },
+  //   { x: x + width, y: y },
+  // ];
+  // corners.forEach((corner) => {
+  //   let dx = corner.x - ball.x;
+  //   let dy = corner.y - ball.y;
+  //   let distance = sqrt(dx * dx + dy * dy);
+  //   if (distance < BALL_RADIUS) {
+  //     let angle = atan2(dy, dx);
+  //     let normalX = cos(angle);
+  //     let normalY = sin(angle);
+  //     let dot = ball.xSpeed * normalX + ball.ySpeed * normalY;
+  //     ball.xSpeed -= 2 * dot * normalX;
+  //     ball.ySpeed -= 2 * dot * normalY;
+
+  //     brick.solid = false;
+  //   }
+  // });
 }
 
 function generateRandomWords(n, length) {
@@ -117,29 +135,35 @@ function generateRandomWords(n, length) {
   return words.map((word) => word.toUpperCase());
 }
 
+function replaceWord(brick) {
+  brick.word = generateRandomWords(1, 5);
+  dictionary[brick.index] = brick.word;
+  console.log(`Brick ${brick.index} is now ${dictionary[brick.index]}`);
+}
+
 sketch.setup = function () {
-  createCanvas((displayWidth * 3) / 4, (displayHeight * 3) / 4);
+  createCanvas((displayWidth * 3) / 4, (displayWidth * 3) / 5.5);
 
   let factory = new BallFactory();
-  let newBall = factory.createBall(width / 2, height / 2, 0, ySpeed);
-  words = generateRandomWords(TOTAL_BRICKS, 5);
+  let newBall = factory.createBall(width / 2, height / 2, 3, -ySpeed);
+  dictionary = generateRandomWords(TOTAL_BRICKS, 5);
   balls.push(newBall);
 
   for (let index = 0; index < TOTAL_BRICKS; index++) {
     const brickFactory = new BrickFactory();
-    bricks.push(brickFactory.createBrick(index, false, `${words[index]}`));
+    bricks.push(brickFactory.createBrick(index, false, `${dictionary[index]}`));
   }
 
-  console.log(words);
+  console.log(dictionary);
 };
 
 sketch.draw = function () {
   background(0, 0, 50);
-  fill(255, 0, 0);
-  noStroke();
+
+  drawCurrentText();
 
   balls.forEach((ball) => {
-    circle(ball.x, ball.y, SIZE);
+    drawBall(ball);
     giveSpeed(ball);
     checkBorderCollision(ball);
   });
@@ -153,16 +177,13 @@ sketch.draw = function () {
     } else {
       fill(0, 0, 50);
     }
-    // fill(0, 255, 0);
     rect(x, y, brickWidth, BRICK_HEIGHT);
+    fill(255);
     brickText(brick, x, y, brickWidth);
     balls.forEach((ball) => {
       checkBrickCollision(x, y, brick, brickWidth, ball);
     });
   });
-
-  fill(255);
-  text(currentText, 20, 30);
 };
 
 sketch.keyPressed = function () {
