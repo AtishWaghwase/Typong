@@ -3,7 +3,6 @@ import { sketch } from "p5js-wrapper";
 import randomWords from "random-words";
 
 let currentText = "";
-let lastText = "";
 
 const SIZE = 50;
 const BALL_RADIUS = 25;
@@ -136,7 +135,7 @@ function generateRandomWords(n, length) {
 }
 
 function replaceWord(brick) {
-  brick.word = generateRandomWords(1, 5);
+  brick.word = generateRandomWords(1, 5)[0];
   dictionary[brick.index] = brick.word;
   console.log(`Brick ${brick.index} is now ${dictionary[brick.index]}`);
 }
@@ -145,7 +144,7 @@ sketch.setup = function () {
   createCanvas((displayWidth * 3) / 4, (displayWidth * 3) / 5.5);
 
   let factory = new BallFactory();
-  let newBall = factory.createBall(width / 2, height / 2, 3, -ySpeed);
+  let newBall = factory.createBall(width / 2, height / 2, 0, -ySpeed);
   dictionary = generateRandomWords(TOTAL_BRICKS, 5);
   balls.push(newBall);
 
