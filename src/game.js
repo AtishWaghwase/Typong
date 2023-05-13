@@ -9,9 +9,10 @@ const SIZE = 50;
 const BALL_RADIUS = 25;
 const BRICK_HEIGHT = 30;
 const TOTAL_BRICKS = 15;
+const SPAWN_THRESHOLD = 3;
 
 let ySpeed = 5;
-let xSpeed = Math.random() * 3 + 2;
+let xSpeed = Math.random() * 3;
 
 let balls = [];
 let bricks = [];
@@ -24,7 +25,6 @@ function BallFactory() {
     ball.y = y;
     ball.xSpeed = xSpeed;
     ball.ySpeed = ySpeed;
-    ball.collisions = 0;
     return ball;
   };
 }
@@ -96,10 +96,10 @@ function checkBrickCollision(x, y, brick, width, ball) {
   }
   if (ball.y + BALL_RADIUS > y && ball.x > x && ball.x < x + width) {
     ball.ySpeed = -ball.ySpeed;
-    console.log("Collision");
-    ball.collisions += 1;
 
-    console.log(ball.collisions);
+    collisionCounter += 1;
+    console.log("Collision");
+    console.log(collisionCounter);
 
     replaceWord(brick);
 
@@ -121,9 +121,31 @@ function generateRandomWords(n, length) {
 }
 
 function replaceWord(brick) {
-  brick.word = generateRandomWords(1, 5)[0];
+  let newWord = generateRandomWords(1, 5)[0];
+  while (dictionary.some((word) => word === newWord)) {
+    newWord = generateRandomWords(1, 5)[0];
+  }
+  brick.word = newWord;
   dictionary[brick.index] = brick.word;
   console.log(`Brick ${brick.index} is now ${dictionary[brick.index]}`);
+}
+
+function spawnBall() {
+  let factory = new BallFactory();
+  let newBall = factory.createBall(width / 2, height / 2, xSpeed, -ySpeed);
+  balls.push(newBall);
+  collisionCounter = 0;
+}
+
+function reduceSpeed() {
+  balls.forEach((ball) => {
+    if (Math.abs(ball.ySpeed) < 1) {
+      console.log("too slow");
+    } else {
+      ball.ySpeed /= 2;
+      console.log(ball.ySpeed);
+    }
+  });
 }
 
 sketch.setup = function () {
@@ -131,8 +153,9 @@ sketch.setup = function () {
 
   let factory = new BallFactory();
   let newBall = factory.createBall(width / 2, height / 2, 0, -ySpeed);
-  dictionary = generateRandomWords(TOTAL_BRICKS, 5);
   balls.push(newBall);
+
+  dictionary = generateRandomWords(TOTAL_BRICKS, 5);
 
   for (let index = 0; index < TOTAL_BRICKS; index++) {
     const brickFactory = new BrickFactory();
@@ -141,11 +164,6 @@ sketch.setup = function () {
 
   console.log(dictionary);
 };
-
-function createBalls() {
-  if (collisionCounter >= 5) {
-  }
-}
 
 sketch.draw = function () {
   background(0, 0, 50);
@@ -173,6 +191,12 @@ sketch.draw = function () {
       checkBrickCollision(x, y, brick, brickWidth, ball);
     });
   });
+
+  if (collisionCounter >= SPAWN_THRESHOLD) {
+    spawnBall();
+    reduceSpeed();
+    console.log(balls);
+  }
 };
 
 sketch.keyPressed = function () {
@@ -189,8 +213,6 @@ sketch.keyPressed = function () {
   } else if (key.length === 1) {
     currentText += key.toUpperCase();
   }
-
-  createBalls();
 };
 
 sketch.mousePressed = function () {
