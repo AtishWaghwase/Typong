@@ -6,7 +6,7 @@ export function drawLoadscreen(w, h, currentScore) {
   textSize(100);
   text("Click to start", w / 2, h / 2);
   textAlign(LEFT, BASELINE);
-  textSize(15);
+  //   textSize(15);
 }
 
 export function drawBall(ball, BALL_RADIUS) {
@@ -15,7 +15,7 @@ export function drawBall(ball, BALL_RADIUS) {
   circle(ball.x, ball.y, BALL_RADIUS * 2);
 }
 
-export function drawCurrentText(w, h, game) {
+export function drawInput(w, h, game) {
   fill(200);
   textSize(100);
   textAlign(CENTER, CENTER);
@@ -37,7 +37,13 @@ export function drawBrick(brick, x, y, brickWidth, brickHeight) {
   let txtX = x + (brickWidth - txtWidth) / 2;
   let txtY = y + (brickHeight + txtSize) / 2;
 
-  fill(255);
+  if (brick.solid) {
+    // fill(0, 50, 50);
+    fill(255);
+  } else {
+    fill(255);
+  }
+
   textSize(txtSize);
   text(brick.word, txtX, txtY);
 }

@@ -15,7 +15,7 @@ import { replaceWord, generateRandomWords, checkWord } from "./utilities";
 import {
   drawBall,
   drawBrick,
-  drawCurrentText,
+  drawInput,
   drawScore,
   drawLoadscreen,
 } from "./draw";
@@ -44,14 +44,14 @@ let game = {
   scoreCounter: 0,
 };
 
-function newGame(w, h) {
+export function newGame(w, h) {
   game.input = "";
   game.collisionCounter = 0;
   balls = [];
   bricks = [];
 
   let factory = new BallFactory();
-  let newBall = factory.createBall(width / 2, height / 2, 0, -ySpeed);
+  let newBall = factory.createBall(width / 2, height / 2, xSpeed, -ySpeed);
   balls.push(newBall);
 
   dictionary = generateRandomWords(TOTAL_BRICKS);
@@ -78,7 +78,7 @@ sketch.draw = function () {
   brickHeight = h * BRICK_HEIGHT;
 
   background(0, 0, 50);
-  drawCurrentText(w, h, game);
+  drawInput(w, h, game);
 
   if (!game.running) {
     drawLoadscreen(w, h, game.scoreCounter);
@@ -92,6 +92,7 @@ sketch.draw = function () {
         width,
         height,
         ball,
+        game,
         scoreHeight,
         brickHeight,
         BALL_RADIUS
@@ -129,18 +130,20 @@ sketch.draw = function () {
 };
 
 sketch.keyPressed = function () {
-  if (keyCode === BACKSPACE) {
-    game.input = game.input.slice(0, -1);
-  } else if (keyCode === 32) {
-    // Ignore spaces
-  } else if (game.input.length >= 4) {
-    game.input += key.toUpperCase();
-    if (checkWord(game.input, dictionary)) {
-      activateBrick(game.input, bricks);
+  if (game.running) {
+    if (keyCode === BACKSPACE) {
+      game.input = game.input.slice(0, -1);
+    } else if (keyCode === 32) {
+      // Ignore spaces
+    } else if (game.input.length >= 4) {
+      game.input += key.toUpperCase();
+      if (checkWord(game.input, dictionary)) {
+        activateBrick(game.input, bricks);
+      }
+      game.input = "";
+    } else if (key.length === 1) {
+      game.input += key.toUpperCase();
     }
-    game.input = "";
-  } else if (key.length === 1) {
-    game.input += key.toUpperCase();
   }
 };
 
@@ -154,5 +157,4 @@ sketch.mousePressed = function () {
     game.running = true;
     game.scoreCounter = 0;
   }
-  console.log(game.running);
 };

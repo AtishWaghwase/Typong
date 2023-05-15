@@ -1,4 +1,5 @@
 import { replaceWord } from "./utilities";
+import { newGame } from "./game";
 
 export function BallFactory() {
   this.createBall = function (x, y, xSpeed, ySpeed) {
@@ -52,21 +53,23 @@ export function randomSpeed(max) {
 }
 
 export function checkBorderCollision(
-  width,
-  height,
+  w,
+  h,
   ball,
+  game,
   scoreHeight,
   brickHeight,
   BALL_RADIUS
 ) {
-  if (ball.x - BALL_RADIUS < 0 || ball.x + BALL_RADIUS > width) {
+  if (ball.y + BALL_RADIUS > h - brickHeight + BALL_RADIUS * 2) {
+    game.running = false;
+    newGame(w, h);
+  }
+  if (ball.x - BALL_RADIUS < 0 || ball.x + BALL_RADIUS > w) {
     ball.xSpeed = -ball.xSpeed;
   }
 
-  if (
-    ball.y - scoreHeight - BALL_RADIUS < 0 ||
-    ball.y + BALL_RADIUS > height - brickHeight + BALL_RADIUS * 2
-  ) {
+  if (ball.y - scoreHeight - BALL_RADIUS < 0) {
     ball.ySpeed = -ball.ySpeed;
   }
 }
