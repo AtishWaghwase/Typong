@@ -23,8 +23,12 @@ export function generateRandomWords(n) {
   return words.map((word) => word.toUpperCase());
 }
 
-function randomBool() {
+export function randomBool() {
   let seed = Math.random();
   if (seed > 0.5) return true;
   else return false;
+}
+
+export function checkWord(string, dictionary) {
+  return dictionary.some((word) => word === string);
 }

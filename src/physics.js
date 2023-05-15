@@ -1,6 +1,6 @@
 import { replaceWord } from "./utilities";
 
-function BallFactory() {
+export function BallFactory() {
   this.createBall = function (x, y, xSpeed, ySpeed) {
     let ball = {};
     ball.x = x;
@@ -8,6 +8,16 @@ function BallFactory() {
     ball.xSpeed = xSpeed;
     ball.ySpeed = ySpeed;
     return ball;
+  };
+}
+
+export function BrickFactory() {
+  this.createBrick = function (i, state, word) {
+    let brick = {};
+    brick.index = i;
+    brick.solid = state;
+    brick.word = word;
+    return brick;
   };
 }
 
@@ -31,10 +41,8 @@ export function spawnBall(ySpeed, balls, game) {
 export function reduceSpeed(balls, SPEED_REDUCER) {
   balls.forEach((ball) => {
     if (Math.abs(ball.ySpeed) < 1) {
-      console.log("too slow");
     } else {
       ball.ySpeed /= SPEED_REDUCER;
-      console.log(ball.ySpeed);
     }
   });
 }
@@ -81,9 +89,6 @@ export function checkBrickCollision(
 
     game.collisionCounter += 1;
     game.scoreCounter += 1;
-    console.log("Collision");
-    console.log(game.collisionCounter);
-    console.log(game.scoreCounter);
 
     replaceWord(brick, dictionary);
 
