@@ -69,9 +69,13 @@ export function checkBorderCollision(
     ball.xSpeed = -ball.xSpeed;
   }
 
-  if (ball.y - scoreHeight - BALL_RADIUS < 0) {
+  if (ball.y - BALL_RADIUS < 0) {
     ball.ySpeed = -ball.ySpeed;
   }
+
+  // if (ball.y - scoreHeight - BALL_RADIUS < 0) {
+  //   ball.ySpeed = -ball.ySpeed;
+  // }
 }
 
 export function checkBrickCollision(

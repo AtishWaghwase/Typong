@@ -105,7 +105,7 @@ sketch.draw = function () {
 
   if (game.running) {
     balls.forEach((ball) => {
-      drawBall(ball, BALL_RADIUS);
+      drawBall(ball, BALL_RADIUS, h, brickHeight);
       giveSpeed(ball);
       checkBorderCollision(
         width,
@@ -152,7 +152,7 @@ sketch.keyPressed = function () {
     if (keyCode === BACKSPACE) {
       game.input = game.input.slice(0, -1);
     } else if (keyCode === 32) {
-      // Ignore spaces
+      game.input = "";
     } else if (game.input.length >= 4) {
       game.input += key.toUpperCase();
       if (checkWord(game.input, dictionary)) {
