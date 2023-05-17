@@ -62,8 +62,11 @@ export function checkBorderCollision(
   BALL_RADIUS
 ) {
   if (ball.y + BALL_RADIUS > h - brickHeight + BALL_RADIUS * 2) {
+    game.lastBallX = ball.x;
+    game.lastBallY = ball.y;
+    game.explosion = true;
     game.running = false;
-    newGame(w, h);
+    newGame();
   }
   if (ball.x - BALL_RADIUS < 0 || ball.x + BALL_RADIUS > w) {
     ball.xSpeed = -ball.xSpeed;
@@ -72,10 +75,6 @@ export function checkBorderCollision(
   if (ball.y - BALL_RADIUS < 0) {
     ball.ySpeed = -ball.ySpeed;
   }
-
-  // if (ball.y - scoreHeight - BALL_RADIUS < 0) {
-  //   ball.ySpeed = -ball.ySpeed;
-  // }
 }
 
 export function checkBrickCollision(

@@ -1,3 +1,4 @@
+import { newGame } from "./game";
 import { getHighestY } from "./utilities";
 
 export function drawBackground(h, balls, backgroundColor) {
@@ -21,8 +22,10 @@ export function drawBackground(h, balls, backgroundColor) {
 export function drawLoadscreen(w, h, currentScore) {
   fill(200);
   textAlign(CENTER, CENTER);
-  textSize(30);
-  text(`Score: ${currentScore}`, w / 2, h / 4);
+  if (currentScore > 0) {
+    textSize(30);
+    text(`Score: ${currentScore}`, w / 2, h / 4);
+  }
   textSize(100);
   text("Click to start", w / 2, h / 2);
   textAlign(LEFT, BASELINE);
@@ -39,6 +42,17 @@ export function drawBall(ball, BALL_RADIUS, h, brickHeight) {
   }
   noStroke();
   circle(ball.x, ball.y, BALL_RADIUS * 2);
+}
+
+export function explodeBall(x, y, w, game) {
+  let transparency = map(game.explosionSize, 0, w * 2, 255, 0);
+  fill(200, 100, 100, transparency);
+  circle(x, y, game.explosionSize);
+  game.explosionSize += 50;
+  if (game.explosionSize > w * 3) {
+    game.explosionSize = 0;
+    game.explosion = false;
+  }
 }
 
 export function drawInput(w, h, game) {

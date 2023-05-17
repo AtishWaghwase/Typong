@@ -24,6 +24,7 @@ import {
   drawScore,
   drawLoadscreen,
   drawBackground,
+  explodeBall,
 } from "./draw";
 
 let scoreHeight, brickHeight;
@@ -49,6 +50,10 @@ let game = {
   input: "",
   collisionCounter: 0,
   scoreCounter: 0,
+  lastBallX: 0,
+  lastBallY: 0,
+  explosion: false,
+  explosionSize: 0,
 };
 
 export function newGame(w, h) {
@@ -70,33 +75,23 @@ export function newGame(w, h) {
 }
 
 sketch.setup = function () {
-  // const w = displayHeight;
-  // const h = w * ASPECT_RATIO;
   const w = windowWidth;
   const h = windowHeight;
-  createCanvas(w, h);
-
   ySpeed = h / 100;
-  console.log(ySpeed);
-
+  createCanvas(w, h);
   textFont("Verdana");
-
   newGame(w, h);
 
   console.log(dictionary);
 };
 
 sketch.draw = function () {
-  // const w = displayHeight;
-  // const h = w * ASPECT_RATIO;
   const w = windowWidth;
   const h = windowHeight;
   scoreHeight = h * SCORE_HEIGHT;
   brickHeight = h * BRICK_HEIGHT;
 
   drawBackground(h, balls, backgroundColor);
-
-  // background(0, 0, 50);
   drawInput(w, h, game);
 
   if (!game.running) {
@@ -145,6 +140,10 @@ sketch.draw = function () {
       reduceSpeed(balls, SPEED_REDUCER);
     }
   }
+
+  if (game.explosion) {
+    explodeBall(game.lastBallX, game.lastBallY, w, game);
+  }
 };
 
 sketch.keyPressed = function () {
@@ -166,8 +165,6 @@ sketch.keyPressed = function () {
 };
 
 sketch.mousePressed = function () {
-  // const w = displayHeight;
-  // const h = w * ASPECT_RATIO;
   const w = windowWidth;
   const h = windowHeight;
   if (game.running) {
