@@ -11,18 +11,25 @@ import {
   activateBrick,
   randomSpeed,
 } from "./physics";
-import { replaceWord, generateRandomWords, checkWord } from "./utilities";
+import {
+  replaceWord,
+  generateRandomWords,
+  checkWord,
+  getHighestY,
+} from "./utilities";
 import {
   drawBall,
   drawBrick,
   drawInput,
   drawScore,
   drawLoadscreen,
+  drawBackground,
 } from "./draw";
 
 let scoreHeight, brickHeight;
-let ySpeed = 5;
-let xSpeed = Math.random() * 3;
+let ySpeed = 7;
+let xSpeed = Math.random() * 5;
+let backgroundColor = 0;
 
 const BALL_RADIUS = 25;
 const TOTAL_BRICKS = 15;
@@ -30,8 +37,8 @@ const SPAWN_THRESHOLD = 3;
 
 const SCORE_HEIGHT = 2 / 24;
 const BRICK_HEIGHT = 1 / 24;
-const ASPECT_RATIO = 9 / 16;
 const SPEED_REDUCER = 1.5;
+// const ASPECT_RATIO = 9 / 16;
 
 let balls = [];
 let bricks = [];
@@ -63,21 +70,33 @@ export function newGame(w, h) {
 }
 
 sketch.setup = function () {
-  const w = displayHeight;
-  const h = w * ASPECT_RATIO;
+  // const w = displayHeight;
+  // const h = w * ASPECT_RATIO;
+  const w = windowWidth;
+  const h = windowHeight;
   createCanvas(w, h);
+
+  ySpeed = h / 100;
+  console.log(ySpeed);
+
+  textFont("Verdana");
+
   newGame(w, h);
 
   console.log(dictionary);
 };
 
 sketch.draw = function () {
-  const w = displayHeight;
-  const h = w * ASPECT_RATIO;
+  // const w = displayHeight;
+  // const h = w * ASPECT_RATIO;
+  const w = windowWidth;
+  const h = windowHeight;
   scoreHeight = h * SCORE_HEIGHT;
   brickHeight = h * BRICK_HEIGHT;
 
-  background(0, 0, 50);
+  drawBackground(h, balls, backgroundColor);
+
+  // background(0, 0, 50);
   drawInput(w, h, game);
 
   if (!game.running) {
@@ -124,7 +143,6 @@ sketch.draw = function () {
     if (game.collisionCounter >= SPAWN_THRESHOLD) {
       spawnBall(ySpeed, balls, game);
       reduceSpeed(balls, SPEED_REDUCER);
-      console.log(balls);
     }
   }
 };
@@ -148,8 +166,10 @@ sketch.keyPressed = function () {
 };
 
 sketch.mousePressed = function () {
-  const w = displayHeight;
-  const h = w * ASPECT_RATIO;
+  // const w = displayHeight;
+  // const h = w * ASPECT_RATIO;
+  const w = windowWidth;
+  const h = windowHeight;
   if (game.running) {
     game.running = false;
     newGame(w, h);

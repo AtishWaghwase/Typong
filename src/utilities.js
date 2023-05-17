@@ -1,4 +1,5 @@
 import randomWords from "random-words";
+// import words from "./random_words";
 
 export function replaceWord(brick, dictionary) {
   let newWord = generateRandomWords(1)[0];
@@ -27,6 +28,12 @@ export function randomBool() {
   let seed = Math.random();
   if (seed > 0.5) return true;
   else return false;
+}
+
+export function getHighestY(balls) {
+  return balls.reduce((maxY, ball) => {
+    return ball.y > maxY ? ball.y : maxY;
+  }, -Infinity);
 }
 
 export function checkWord(string, dictionary) {

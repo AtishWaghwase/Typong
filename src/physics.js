@@ -41,7 +41,7 @@ export function spawnBall(ySpeed, balls, game) {
 
 export function reduceSpeed(balls, SPEED_REDUCER) {
   balls.forEach((ball) => {
-    if (Math.abs(ball.ySpeed) < 1) {
+    if (Math.abs(ball.ySpeed) < 1.5) {
     } else {
       ball.ySpeed /= SPEED_REDUCER;
     }
