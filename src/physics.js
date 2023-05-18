@@ -29,12 +29,7 @@ export function giveSpeed(ball) {
 
 export function spawnBall(ySpeed, balls, game) {
   let factory = new BallFactory();
-  let newBall = factory.createBall(
-    width / 2,
-    height / 2,
-    randomSpeed(3),
-    -ySpeed
-  );
+  let newBall = factory.createBall(width / 2, height / 2, randomSpeed(3), -ySpeed);
 
   balls.push(newBall);
   game.collisionCounter = 0;
@@ -42,8 +37,7 @@ export function spawnBall(ySpeed, balls, game) {
 
 export function reduceSpeed(balls, SPEED_REDUCER) {
   balls.forEach((ball) => {
-    if (Math.abs(ball.ySpeed) < 1.5) {
-    } else {
+    if (!(Math.abs(ball.ySpeed) < 1.5)) {
       ball.ySpeed /= SPEED_REDUCER;
     }
   });
@@ -53,14 +47,7 @@ export function randomSpeed(max) {
   return Math.random() * max;
 }
 
-export function checkBorderCollision(
-  w,
-  h,
-  ball,
-  game,
-  brickHeight,
-  BALL_RADIUS
-) {
+export function checkBorderCollision(w, h, ball, game, brickHeight, BALL_RADIUS) {
   if (ball.y + BALL_RADIUS > h - brickHeight + BALL_RADIUS * 2) {
     game.lastBallX = ball.x;
     game.lastBallY = ball.y;
@@ -76,16 +63,7 @@ export function checkBorderCollision(
   }
 }
 
-export function checkBrickCollision(
-  x,
-  y,
-  brick,
-  width,
-  ball,
-  game,
-  BALL_RADIUS,
-  dictionary
-) {
+export function checkBrickCollision(x, y, brick, width, ball, game, BALL_RADIUS, dictionary) {
   if (!brick.solid) {
     return;
   }

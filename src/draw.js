@@ -5,10 +5,7 @@ export function drawBackground(h, balls, backgroundColor) {
   let to = color(100, 70, 160);
   let from = color(21, 37, 94);
 
-  if (!(yMax > (h * 4) / 5)) {
-    yMax = (h * 4) / 5;
-  }
-
+  yMax = !(yMax > (h * 4) / 5) ? (h * 4) / 5 : yMax;
   backgroundColor = map(yMax, (h * 4) / 5, h, 0, 1);
   let newCol = lerpColor(from, to, backgroundColor);
   background(newCol);
@@ -52,13 +49,9 @@ export function drawLoadscreen(w, h, currentScore) {
 }
 
 export function drawBall(ball, BALL_RADIUS, h, brickHeight) {
-  if (ball.y > h - brickHeight) {
-    fill(255, 100, 100);
-  } else if (ball.ySpeed >= 0) {
-    fill(200, 200, 255);
-  } else {
-    fill(100, 100, 160);
-  }
+  if (ball.y > h - brickHeight) fill(255, 100, 100);
+  else if (ball.ySpeed >= 0) fill(200, 200, 255);
+  else fill(100, 100, 160);
   noStroke();
   circle(ball.x, ball.y, BALL_RADIUS * 2);
 }

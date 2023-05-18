@@ -1,30 +1,11 @@
 import "../css/style.css";
 import { sketch } from "p5js-wrapper";
-import {
-  BallFactory,
-  BrickFactory,
-  giveSpeed,
-  reduceSpeed,
-  spawnBall,
-  checkBorderCollision,
-  checkBrickCollision,
-  activateBrick,
-} from "./physics";
+import { BallFactory, BrickFactory, giveSpeed, reduceSpeed, spawnBall, checkBorderCollision, checkBrickCollision, activateBrick } from "./physics";
 import { generateRandomWords, checkWord } from "./utilities";
-import {
-  drawBall,
-  drawBrick,
-  drawInput,
-  drawScore,
-  drawLoadscreen,
-  drawBackground,
-  explodeBall,
-} from "./draw";
+import { drawBall, drawBrick, drawInput, drawScore, drawLoadscreen, drawBackground, explodeBall } from "./draw";
 
-let scoreHeight, brickHeight;
+let scoreHeight, brickHeight, backgroundColor;
 let ySpeed = 7;
-let xSpeed = Math.random() * 5;
-let backgroundColor = 0;
 
 const BALL_RADIUS = 25;
 const TOTAL_BRICKS = 15;
@@ -38,7 +19,7 @@ let bricks = [];
 let dictionary = [];
 
 let game = {
-  running: true,
+  running: false,
   input: "",
   collisionCounter: 0,
   scoreCounter: 0,
@@ -55,7 +36,7 @@ export function newGame(w, h) {
   bricks = [];
 
   let factory = new BallFactory();
-  let newBall = factory.createBall(w / 2, h / 2, xSpeed, -ySpeed);
+  let newBall = factory.createBall(w / 2, h / 2, Math.random() * 5, -ySpeed);
   balls.push(newBall);
 
   dictionary = generateRandomWords(TOTAL_BRICKS);
@@ -84,9 +65,7 @@ sketch.draw = function () {
   drawBackground(h, balls, backgroundColor);
   drawInput(w, h, game);
 
-  if (!game.running) {
-    drawLoadscreen(w, h, game.scoreCounter);
-  }
+  if (!game.running) drawLoadscreen(w, h, game.scoreCounter);
 
   if (game.running) {
     balls.forEach((ball) => {
@@ -102,16 +81,7 @@ sketch.draw = function () {
       drawBrick(brick, x, y, brickWidth, brickHeight);
 
       balls.forEach((ball) => {
-        checkBrickCollision(
-          x,
-          y,
-          brick,
-          brickWidth,
-          ball,
-          game,
-          BALL_RADIUS,
-          dictionary
-        );
+        checkBrickCollision(x, y, brick, brickWidth, ball, game, BALL_RADIUS, dictionary);
       });
     });
 
@@ -123,9 +93,7 @@ sketch.draw = function () {
     }
   }
 
-  if (game.explosion) {
-    explodeBall(game.lastBallX, game.lastBallY, w, game);
-  }
+  if (game.explosion) explodeBall(game.lastBallX, game.lastBallY, w, game);
 };
 
 sketch.keyPressed = function () {
@@ -149,13 +117,7 @@ sketch.keyPressed = function () {
 sketch.mousePressed = function () {
   const w = windowWidth;
   const h = windowHeight;
-  if (game.running) {
-    game.running = false;
-    newGame(w, h);
-  } else {
-    game.running = true;
-    game.scoreCounter = 0;
-  }
+  game.running ? (newGame(w, h), (game.running = false)) : ((game.running = true), (game.scoreCounter = 0));
 };
 
 sketch.windowResized = function () {

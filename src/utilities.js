@@ -13,10 +13,7 @@ export function generateRandomWords(n) {
   let words = [];
   while (words.length < n) {
     let newWords = randomWords({ exactly: n - words.length });
-    newWords = newWords.filter(
-      (word) =>
-        word.length === 5 && !words.includes(word) && !words.includes(word)
-    );
+    newWords = newWords.filter((word) => word.length === 5 && !words.includes(word) && !words.includes(word));
     words.push(...newWords);
   }
   return words.map((word) => word.toUpperCase());
