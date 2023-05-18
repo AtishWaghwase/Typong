@@ -1,21 +1,16 @@
-import { newGame } from "./game";
 import { getHighestY } from "./utilities";
 
 export function drawBackground(h, balls, backgroundColor) {
   let yMax = getHighestY(balls);
   let to = color(100, 70, 160);
   let from = color(21, 37, 94);
-  // let from = color(218, 165, 32);
 
-  if (yMax > (h * 4) / 5) {
-  } else {
+  if (!(yMax > (h * 4) / 5)) {
     yMax = (h * 4) / 5;
   }
 
   backgroundColor = map(yMax, (h * 4) / 5, h, 0, 1);
-
   let newCol = lerpColor(from, to, backgroundColor);
-
   background(newCol);
 }
 
@@ -24,7 +19,7 @@ export function drawLoadscreen(w, h, currentScore) {
   textSize(h / 40);
   textStyle(BOLD);
   textAlign(LEFT, BOTTOM);
-  text(" TYPONG: Fast Finger Fury!™", (w * 1) / 7, (h * 1) / 5);
+  text(" TYPONG: Hail Hydra!™", (w * 1) / 7, (h * 1) / 5);
   textStyle(NORMAL);
 
   if (currentScore > 0) {
@@ -35,12 +30,13 @@ export function drawLoadscreen(w, h, currentScore) {
     textStyle(NORMAL);
     fill(200);
   }
+
   textSize(h / 32);
   textWrap(WORD);
   textAlign(LEFT, BOTTOM);
-  textLeading((w / 50) * 1.5);
+  textLeading((h / 32) * 1.5);
   text(
-    "Don't let the ball touch the bottom! When a ball touches a brick, it will bounce off it, and destroy the brick. Type the words that appear in their place to rebuild them. A new ball will spawn every three points!",
+    "Don't let the ball touch the bottom! When a ball bounces off a brick, it gives you one point and destroys the brick. Type the words that appear in their place to rebuild them. A new ball will spawn every three points!",
     (w * 1) / 7,
     (h * 3) / 5,
     (w * 5) / 7
@@ -88,11 +84,7 @@ export function drawInput(w, h, game) {
 }
 
 export function drawBrick(brick, x, y, brickWidth, brickHeight) {
-  if (brick.solid) {
-    fill(72, 61, 139);
-  } else {
-    fill(0, 0, 50, 0, 0);
-  }
+  brick.solid ? fill(72, 61, 139) : fill(0, 0, 50, 0, 0);
   rect(x, y, brickWidth, brickHeight);
 
   let txtSize = brickWidth / 5;
@@ -100,13 +92,7 @@ export function drawBrick(brick, x, y, brickWidth, brickHeight) {
   let txtX = x + (brickWidth - txtWidth) / 2;
   let txtY = y + (brickHeight + txtSize) / 2;
 
-  if (brick.solid) {
-    fill(72, 61, 139, 0);
-    // fill(255);
-  } else {
-    fill(255);
-  }
-
+  brick.solid ? fill(72, 61, 139, 0) : fill(255);
   textSize(txtSize);
   text(brick.word, txtX, txtY);
 }

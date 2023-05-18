@@ -35,6 +35,7 @@ export function spawnBall(ySpeed, balls, game) {
     randomSpeed(3),
     -ySpeed
   );
+
   balls.push(newBall);
   game.collisionCounter = 0;
 }
@@ -57,7 +58,6 @@ export function checkBorderCollision(
   h,
   ball,
   game,
-  scoreHeight,
   brickHeight,
   BALL_RADIUS
 ) {
@@ -71,7 +71,6 @@ export function checkBorderCollision(
   if (ball.x - BALL_RADIUS < 0 || ball.x + BALL_RADIUS > w) {
     ball.xSpeed = -ball.xSpeed;
   }
-
   if (ball.y - BALL_RADIUS < 0) {
     ball.ySpeed = -ball.ySpeed;
   }
@@ -95,17 +94,14 @@ export function checkBrickCollision(
 
     game.collisionCounter += 1;
     game.scoreCounter += 1;
-
-    replaceWord(brick, dictionary);
-
     brick.solid = false;
+    replaceWord(brick, dictionary);
   }
 }
 
 export function activateBrick(string, bricks) {
   bricks.map((brick) => {
     if (brick.word === string) {
-      console.log(`Brick ${brick.word} set to true`);
       brick.solid = true;
     }
   });

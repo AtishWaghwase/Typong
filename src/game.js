@@ -9,14 +9,8 @@ import {
   checkBorderCollision,
   checkBrickCollision,
   activateBrick,
-  randomSpeed,
 } from "./physics";
-import {
-  replaceWord,
-  generateRandomWords,
-  checkWord,
-  getHighestY,
-} from "./utilities";
+import { generateRandomWords, checkWord } from "./utilities";
 import {
   drawBall,
   drawBrick,
@@ -35,11 +29,9 @@ let backgroundColor = 0;
 const BALL_RADIUS = 25;
 const TOTAL_BRICKS = 15;
 const SPAWN_THRESHOLD = 3;
-
 const SCORE_HEIGHT = 2 / 24;
 const BRICK_HEIGHT = 1 / 24;
 const SPEED_REDUCER = 1.5;
-// const ASPECT_RATIO = 9 / 16;
 
 let balls = [];
 let bricks = [];
@@ -63,7 +55,7 @@ export function newGame(w, h) {
   bricks = [];
 
   let factory = new BallFactory();
-  let newBall = factory.createBall(width / 2, height / 2, xSpeed, -ySpeed);
+  let newBall = factory.createBall(w / 2, h / 2, xSpeed, -ySpeed);
   balls.push(newBall);
 
   dictionary = generateRandomWords(TOTAL_BRICKS);
@@ -81,8 +73,6 @@ sketch.setup = function () {
   createCanvas(w, h);
   textFont("Verdana");
   newGame(w, h);
-
-  console.log(dictionary);
 };
 
 sketch.draw = function () {
@@ -102,15 +92,7 @@ sketch.draw = function () {
     balls.forEach((ball) => {
       drawBall(ball, BALL_RADIUS, h, brickHeight);
       giveSpeed(ball);
-      checkBorderCollision(
-        width,
-        height,
-        ball,
-        game,
-        scoreHeight,
-        brickHeight,
-        BALL_RADIUS
-      );
+      checkBorderCollision(width, height, ball, game, brickHeight, BALL_RADIUS);
     });
 
     bricks.forEach((brick) => {
@@ -174,4 +156,8 @@ sketch.mousePressed = function () {
     game.running = true;
     game.scoreCounter = 0;
   }
+};
+
+sketch.windowResized = function () {
+  resizeCanvas(windowWidth, windowHeight);
 };

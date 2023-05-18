@@ -1,10 +1,26 @@
-# P5.js-vite Starter Template 🚀
+# **Typong** : Pong Breaker with Keyboard Input
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+- **URL:** http://git.prototyping.id/20236043/homework5.git
 
-[Vite](https://vitejs.dev/) starter template to scaffold a new [p5.js](https://p5js.org) project.
+- **Name:** Atish Waghwase
 
-This is an unopinionated template; aside from P5.js and Vite, the rest of your project's tools are entirely up to you.
+- **KAIST ID:** 20236043
+
+- **Table of Contents:**
+  - [Motivation](#motivation)
+  - [Description](#description)
+  - [Blueprint](#blueprint)
+  - [Challenges and Learning](#challenges-and-learning)
+
+<br>
+
+## Motivation
+
+I really appreciate a good typing experience, and every since I got my first mechanical keyboard, I love typing with it. Mindlessly typing on MonkeyType has almost become a fidgeting mechanism for me, but I have always appreciated the design of the website. I have long been curious about how it was built, since it looks simple enough to code yet challenging enough to get right.
+
+Therefore, I want to make a game that uses typing as input, rather than using traditional input keys.
+
+<br>
 
 ## Live demo
 
@@ -35,8 +51,8 @@ Note that if after this last command you do not see anything, you can use instea
 ## A single p5.js sketch
 
 ```js
-import '../css/style.css';
-import { sketch } from 'p5js-wrapper';
+import "../css/style.css";
+import { sketch } from "p5js-wrapper";
 
 sketch.setup = function () {
   createCanvas(800, 600);
@@ -68,31 +84,31 @@ And here the body of the html file:
 If you want to use multiple sketches, you need to use a different syntax.
 
 ```js
-import '../css/style.css';
-import { p5 } from 'p5js-wrapper';
+import "../css/style.css";
+import { p5 } from "p5js-wrapper";
 
 let sketch1 = new p5((p) => {
   p.setup = () => {
-    const one = document.getElementById('one');
+    const one = document.getElementById("one");
     p.createCanvas(one.clientWidth, one.clientHeight);
   };
 
   p.draw = () => {
     p.background(100);
   };
-}, 'one');
+}, "one");
 
 // Sketch2
 let sketch2 = new p5((p) => {
   p.setup = () => {
-    const two = document.getElementById('two');
+    const two = document.getElementById("two");
     p.createCanvas(two.clientWidth, two.clientHeight);
   };
 
   p.draw = () => {
     p.background(170);
   };
-}, 'two');
+}, "two");
 ```
 
 This file is expecting two divs in the html file:
@@ -112,10 +128,10 @@ Sound is an [experimental feature](https://github.com/makinteract/p5js-wrapper/b
 Examples usage:
 
 ```js
-import { sketch } from 'p5js-wrapper';
-import 'p5js-wrapper/sound';
+import { sketch } from "p5js-wrapper";
+import "p5js-wrapper/sound";
 
-import mysound from './mysound.mp3';
+import mysound from "./mysound.mp3";
 
 let soundEffect;
 
@@ -125,7 +141,7 @@ sketch.setup = function () {
 };
 
 sketch.draw = function () {
-  background('#eeeeee');
+  background("#eeeeee");
 };
 
 // Play sound on click
