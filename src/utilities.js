@@ -1,4 +1,4 @@
-import randomWords from "random-words";
+import { wordList } from "./words";
 
 export function replaceWord(brick, dictionary) {
   let newWord = generateRandomWords(1)[0];
@@ -10,13 +10,14 @@ export function replaceWord(brick, dictionary) {
 }
 
 export function generateRandomWords(n) {
-  let words = [];
-  while (words.length < n) {
-    let newWords = randomWords({ exactly: n - words.length });
-    newWords = newWords.filter((word) => word.length === 5 && !words.includes(word) && !words.includes(word));
-    words.push(...newWords);
+  const fiveLetterWords = wordList.filter((word) => word.length === 5);
+  const result = [];
+  for (let i = 0; i < n; i++) {
+    const randomIndex = Math.floor(Math.random() * fiveLetterWords.length);
+    result.push(fiveLetterWords[randomIndex]);
+    fiveLetterWords.splice(randomIndex, 1);
   }
-  return words.map((word) => word.toUpperCase());
+  return result.map((word) => word.toUpperCase());
 }
 
 export function getHighestY(balls) {

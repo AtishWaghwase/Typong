@@ -1,6 +1,6 @@
-# **Typong** : Pong Breaker with Keyboard Input
+# **Typong** : Pong Breaker Using Keyboard Input
 
-- **URL:** http://git.prototyping.id/20236043/homework5.git
+- **URL:** https://github.com/AtishWaghwase/Typong
 
 - **Name:** Atish Waghwase
 
@@ -14,29 +14,23 @@
 
 <br>
 
-## Motivation
+## Introduction
 
-I really appreciate a good typing experience, and every since I got my first mechanical keyboard, I love typing with it. Mindlessly typing on MonkeyType has almost become a fidgeting mechanism for me, but I have always appreciated the design of the website. I have long been curious about how it was built, since it looks simple enough to code yet challenging enough to get right.
+Typong is based on Pong Breaker, a classic game that involves a ball and an array of bricks that need to be destroyed by shooting the ball at them.
 
-Therefore, I want to make a game that uses typing as input, rather than using traditional input keys.
+There is a ball which travels at a constant speed and bounces off the top, left and right edges of the screen, however if it touches the bottom edge, the game is over. To keep it from doing so, there is a strip of 15 bricks that lies on the bottom edge which the ball can bounce off of. Every time the ball bounces off a brick, you gain a point, however the brick gets destroyed. In its place, a random five-letter word appears. In order to spawn the brick again, type the newly appeared word. You can see a preview of what you type at the centre of the screen. This game adds challenge by spawning one additional ball every three points; like the mythical creature Hydra.
+
+The goal of the game is to score the maximum amount of points by continually spawning bricks as they get destroyed, thus keeping the balls from reaching the bottom edge.
+
+## Overview
+
+The game is built using [P5.JS](https://p5js.org/get-started/) and [Vite](https://vitejs.dev/) using the [template](https://github.com/makinteract/p5js-vite) provided by MAKInteract Lab. It uses the [random-words](https://www.npmjs.com/package/random-words) npm package to generate random five-letter words. The main code is contained in `game.js` while the supporting functions are organised into three files, viz. `physics.js`, `draw.js` and `utilities.js`.
+
+### Game.js
 
 <br>
 
-## Live demo
-
-For a live demo please [visit this page](https://p5js-vite-demo.surge.sh).
-
-## Installation
-
-Pull the template files with [degit](https://github.com/Rich-Harris/degit) and install dependencies.
-
-```
-npx degit makinteract/p5js-vite my-project
-
-cd my-project
-npm install
-npm run dev
-```
+---
 
 ## npm scripts
 

@@ -16,7 +16,7 @@ export function drawLoadscreen(w, h, currentScore) {
   textSize(h / 40);
   textStyle(BOLD);
   textAlign(LEFT, BOTTOM);
-  text(" TYPONG: Hail Hydra!™", (w * 1) / 7, (h * 1) / 5);
+  text(" Typong™", (w * 1) / 7, (h * 1) / 5);
   textStyle(NORMAL);
 
   if (currentScore > 0) {
@@ -26,11 +26,18 @@ export function drawLoadscreen(w, h, currentScore) {
     text(`Score: ${currentScore}`, (w * 1) / 7, (h * 2) / 5);
     textStyle(NORMAL);
     fill(200);
+  } else {
+    fill(200, 200, 255);
+    textSize(h / 16);
+    textStyle(BOLD);
+    text(`Are you ready?`, (w * 1) / 7, (h * 2) / 5);
+    textStyle(NORMAL);
+    fill(200);
   }
 
   textSize(h / 32);
   textWrap(WORD);
-  textAlign(LEFT, BOTTOM);
+  textAlign(LEFT, CENTER);
   textLeading((h / 32) * 1.5);
   text(
     "Don't let the ball touch the bottom! When a ball bounces off a brick, it gives you one point and destroys the brick. Type the words that appear in their place to rebuild them. A new ball will spawn every three points!",
