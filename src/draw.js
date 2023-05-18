@@ -3,8 +3,8 @@ import { getHighestY } from "./utilities";
 
 export function drawBackground(h, balls, backgroundColor) {
   let yMax = getHighestY(balls);
-  let to = color(72, 61, 139);
-  let from = color(0, 0, 50);
+  let to = color(100, 70, 160);
+  let from = color(21, 37, 94);
   // let from = color(218, 165, 32);
 
   if (yMax > (h * 4) / 5) {
@@ -21,15 +21,38 @@ export function drawBackground(h, balls, backgroundColor) {
 
 export function drawLoadscreen(w, h, currentScore) {
   fill(200);
-  textAlign(CENTER, CENTER);
+  textSize(h / 40);
+  textStyle(BOLD);
+  textAlign(LEFT, BOTTOM);
+  text(" TYPONG: Fast Finger Fury!™", (w * 1) / 7, (h * 1) / 5);
+  textStyle(NORMAL);
+
   if (currentScore > 0) {
-    textSize(30);
-    text(`Score: ${currentScore}`, w / 2, h / 4);
+    fill(200, 200, 255);
+    textSize(h / 16);
+    textStyle(BOLD);
+    text(`Score: ${currentScore}`, (w * 1) / 7, (h * 2) / 5);
+    textStyle(NORMAL);
+    fill(200);
   }
-  textSize(100);
-  text("Click to start", w / 2, h / 2);
+  textSize(h / 32);
+  textWrap(WORD);
+  textAlign(LEFT, BOTTOM);
+  textLeading((w / 50) * 1.5);
+  text(
+    "Don't let the ball touch the bottom! When a ball touches a brick, it will bounce off it, and destroy the brick. Type the words that appear in their place to rebuild them. A new ball will spawn every three points!",
+    (w * 1) / 7,
+    (h * 3) / 5,
+    (w * 5) / 7
+  );
+  textSize(h / 32);
+  textStyle(BOLD);
+
+  fill(255);
+  text("Click to play >>", (w * 1) / 7, (h * 4) / 5);
+  textStyle(NORMAL);
+
   textAlign(LEFT, BASELINE);
-  //   textSize(15);
 }
 
 export function drawBall(ball, BALL_RADIUS, h, brickHeight) {
