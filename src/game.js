@@ -45,6 +45,7 @@ export function newGame(w, h) {
 
   // Generate random words for the bricks and create new bricks
   dictionary = generateRandomWords(TOTAL_BRICKS);
+
   for (let index = 0; index < TOTAL_BRICKS; index++) {
     const brickFactory = new BrickFactory();
     bricks.push(brickFactory.createBrick(index, true, `${dictionary[index]}`));
