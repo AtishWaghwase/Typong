@@ -9,11 +9,11 @@
 - [**Typong** : Pong Breaker Using Keyboard Input](#typong--pong-breaker-using-keyboard-input)
   - [Introduction](#introduction)
   - [Overview](#overview)
-  - [npm scripts](#npm-scripts)
-  - [A single p5.js sketch](#a-single-p5js-sketch)
-  - [Multiple p5.js sketches](#multiple-p5js-sketches)
-  - [Adding sound](#adding-sound)
-  - [License](#license)
+  - [Game.js](#gamejs)
+  - [Physics.js](#physicsjs)
+  - [Draw.js](#drawjs)
+  - [Utilities.js](#utilitiesjs)
+  - [References](#references)
 
 <br>
 
@@ -21,13 +21,22 @@
 
 Typong is based on Pong Breaker, a classic game that involves a ball and an array of bricks that need to be destroyed by shooting the ball at them. The goal of Typong is to score the maximum amount of points by spawning bricks as they get destroyed, thus keeping the balls from reaching the bottom edge.
 
-There is a ball which travels at a constant speed and bounces off the top, left and right edges of the screen, however if it touches the bottom edge, the game is over. To keep it from doing so, there is a strip of 15 bricks that lies on the bottom edge which the ball can bounce off of. Every time the ball bounces off a brick, you gain a point, however the brick gets destroyed. In its place, a random five-letter word appears. In order to spawn the brick again, type the newly appeared word. You can see a preview of what you type at the centre of the screen. This game adds challenge by spawning one additional ball every three points.
+![Cover Image](/assets/Cover.png)
+
+<figcaption>Figure 1: Typong is a game that is based on Pong Breaker, and uses keyboard input.</figcaption>
+<br>
+
+### Gameplay
+
+There is a ball which travels at a constant speed and bounces off the top, left and right edges of the screen, however if it touches the bottom edge, the game is over. To keep it from doing so, there is a strip of 15 bricks that lies on the bottom edge which the ball can bounce off of. Every time the ball bounces off a brick, you gain a point, however the brick gets destroyed. In its place, a random five-letter word appears. In order to spawn the brick again, type the newly appeared word. You can see a preview of what you type at the centre of the screen. This game adds challenge by spawning one additional ball every three points. Click the left mouse button at any time to stop the game; click again to start a new game.
 
 ## Overview
 
-The game is built using [P5.JS](https://p5js.org/get-started/) and [Vite](https://vitejs.dev/) using the [template](https://github.com/makinteract/p5js-vite) provided by MAKInteract Lab. It uses the [random-words](https://www.npmjs.com/package/random-words) npm package to generate random five-letter words. The main code is contained in `game.js` while the supporting functions are organised into three files, viz. `physics.js`, `draw.js` and `utilities.js`.
+The game is built using [P5.JS](https://p5js.org/get-started/) and [Vite](https://vitejs.dev/) using the [template](https://github.com/makinteract/p5js-vite) provided by MAKInteract Lab. It uses the [random-words](https://www.npmjs.com/package/random-words) npm package to generate random five-letter words. The main code is contained in `game.js` while the supporting functions are organised into three files, viz. `physics.js`, `draw.js` and `utilities.js`. There is also `words.js` which is a directory of English words.
 
-The `sketch.setup()` function is used to set the width and height of the canvas as per the current window dimensions, and set the font to _Verdana_. Then it calls the function `newGame()`
+## Game.js
+
+The `sketch.setup()` function is used to set the width and height of the canvas as per the current window dimensions, and set the font to _Verdana_. Then it calls the function `newGame()`. The `newGame()` function resets the counters and clears the arrays `balls[]` and `bricks[]`. It creates a new ball at the centre of the canvas and adds it to `balls[]`. It also uses the `generateRandomWords()` function to populate the `dictionary[]` which contains the words to be displayed at the bottom.
 
 ```js
 sketch.setup = function () {
@@ -38,23 +47,6 @@ sketch.setup = function () {
   textFont("Verdana");
   newGame(w, h);
 };
-```
-
-The `newGame()` function resets the counters and clears the arrays `balls[]` and `bricks[]`. It creates a new ball at the centre of the canvas and adds it to `balls[]`. It also uses the `generateRandomWordss()` function to populate the `dictionary[]` which contains the words to be displayed at the bottom.
-
-```js
-// Ball and brick factories
-
-let factory = new BallFactory();
-let newBall = factory.createBall(w / 2, h / 2, Math.random() * 5, -ySpeed);
-balls.push(newBall);
-
-dictionary = generateRandomWords(TOTAL_BRICKS);
-
-for (let index = 0; index < TOTAL_BRICKS; index++) {
-  const brickFactory = new BrickFactory();
-  bricks.push(brickFactory.createBrick(index, true, `${dictionary[index]}`));
-}
 ```
 
 The `sketch.draw()` function performs the following tasks:
@@ -103,3 +95,180 @@ The `sketch.mousePressed()` function toggles `game.running`.
 
 1. If the game was already running, then stop the game and call `newGame()`.
 2. If the game was started after the previous round ended, set the `scoreCounter` to 0.
+
+<br>
+
+## Physics.js
+
+This page contains the `BallFactory()` and the `BrickFactory()`, as well as the functions `giveSpeed()`, `spawnBall()`, `reduceSpeed()`, `checkBorderCollision()`, `checkBrickCollision()` and `activateBrick()`. These functions take in parameters and compute the physics of the game.
+
+For example, here is the `checkBrickCollision()` function:
+
+```js
+// Handle ball collisions with the bricks
+
+export function checkBrickCollision(x, y, brick, width, ball, game, BALL_RADIUS, dictionary) {
+  if (!brick.solid) {
+    return;
+  }
+  if (ball.y + BALL_RADIUS > y && ball.x > x && ball.x < x + width) {
+    ball.ySpeed = -ball.ySpeed;
+
+    game.collisionCounter += 1;
+    game.scoreCounter += 1;
+    brick.solid = false;
+    replaceWord(brick, dictionary);
+  }
+}
+```
+
+Note that even though the ball is circular, this code is calculating a simple bounding box collision with the ball. This was done because adding a complex collision didn't contribute much to the experience. In fact, corner collision ended up directing the ball more horizontally than vertically. This meant the ball would keep bouncing between the left and right edges, which led to a long wait before the ball actually comes to the bricks. This is the corner collision mechanism that was tested:
+
+```js
+// Corner collision addition for checkBrickCollision()
+
+let corners = [
+  { x: x, y: y },
+  { x: x + width, y: y },
+];
+corners.forEach((corner) => {
+  let dx = corner.x - ball.x;
+  let dy = corner.y - ball.y;
+  let distance = sqrt(dx * dx + dy * dy);
+  if (distance < BALL_RADIUS) {
+    let angle = atan2(dy, dx);
+    let normalX = cos(angle);
+    let normalY = sin(angle);
+    let dot = ball.xSpeed * normalX + ball.ySpeed * normalY;
+    ball.xSpeed -= 2 * dot * normalX;
+    ball.ySpeed -= 2 * dot * normalY;
+
+    brick.solid = false;
+  }
+});
+```
+
+<br>
+
+## Draw.js
+
+### drawBackground()
+
+The `drawBackground()` function changes the color based on the location of the ball closest to the bottom edge. Here is how it works:
+
+1. It gets the location of the bottom most ball at any point of time.
+2. If the ball is greater than 4/5 times the height, then it assigns its y-coordinate to `yMax`.
+3. Beyond 4/5 times height, it maps the locations between `4/5 * h` and `h` to 0-1 to the variable `backgroundColor` . Then it uses the `lerpColor()` function to transition between the two colors using `backgroundColor`.
+
+```js
+// Change background color based on y-coordinate
+
+export function drawBackground(h, balls, backgroundColor) {
+  let yMax = getHighestY(balls);
+  let to = color(100, 70, 160);
+  let from = color(21, 37, 94);
+
+  yMax = !(yMax > (h * 4) / 5) ? (h * 4) / 5 : yMax;
+  backgroundColor = map(yMax, (h * 4) / 5, h, 0, 1);
+  let newCol = lerpColor(from, to, backgroundColor);
+  background(newCol);
+}
+```
+
+<br>
+
+### drawLoadscreen()
+
+One thing to note is that this game defines all distances as ratios of `windowHeight` or `windowWidth`. This way it should work on all screen aspect rations (at least landscape ones). For example:
+
+1. The bounding box for the score counter `SCORE_HEIGHT` and the height of the bricks `BRICK_HEIGHT` are actually multipliers for `windowHeight`.
+2. The threshold for the background to change color is defined as 4/5 times the height.
+3. Even the ySpeed is calculated as `h / 100`, and it is later reduced by `SPEED_REDUCER` by a factor of `1.5`.
+
+![Loadscreen](/assets/Loadscreen.png)
+
+<figcaption>Figure 2: Visual elements are placed in ratios of windowHeight and windowWidth for better scaling across displys.</figcaption>
+<br>
+
+However, some ratios are hard-coded; as they will be used only once, it did not make sense to parametrise them. Therefore you will find a lot of terms like `((h * 5) / 7)`. In drawLoadscreen(),
+
+1. The name 'Typong™' is placed at `1/5 * h`
+2. The primary text is placed at `2/5 * h` is contextual:
+   1. If the score is zero, it displays `Are you ready?`.
+   2. If the score is no-zero, it displays the score.
+3. The rules of the game are placed at `3/5 * h`.
+4. The CTA 'Click to play' is placed at `4/5 * h`.
+
+<br>
+
+![Ball states](assets/Ball%20States.png)
+
+<figcaption>Figure 3: Ball states change depending on direction and y-coordinate.</figcaption>
+<br>
+
+### drawBall() and explodeBall()
+
+The ball changes color based on direction and y-coordinate.
+
+1. If the ball is going up, it has a dim purple color.
+2. If the ball is going down, it has a bright purple color.
+3. If the ball is beyond the line of bricks, it has a light red color.
+
+```js
+// Draw ball based on its y-coordinate
+
+export function drawBall(ball, BALL_RADIUS, h, brickHeight) {
+  if (ball.y > h - brickHeight) fill(255, 100, 100);
+  else if (ball.ySpeed >= 0) fill(200, 200, 255);
+  else fill(100, 100, 160);
+  noStroke();
+  circle(ball.x, ball.y, BALL_RADIUS * 2);
+}
+```
+
+<br>
+
+When the ball touches the bottom edge, it leads to an explosion effect. This is achieved by starting with a circle of zero radius and making it progressively larger every loop. The transparency is decreased as a function of size; which is calculated by `windowWidth`.
+
+```js
+// Animate an exploding ball
+
+export function explodeBall(x, y, w, h, game) {
+  let transparency = map(game.explosionSize, 0, w * 2, 255, 0);
+  fill(200, 100, 100, transparency);
+  circle(x, y, game.explosionSize);
+
+  game.explosionSize += 50;
+  if (game.explosionSize > w * 3) {
+    game.explosionSize = 0;
+    game.explosion = false;
+    newGame(w, h);
+  }
+}
+```
+
+<br>
+
+## Utilities.js
+
+The `generateRandomWords()` function uses the word directory in `words.js` and returns `n` random words which do not repeat. This is ensured by using `Array.splice()`. Then it uses the `Array.map()` function and `String.toUppercase` to fetch words in the desired format.
+
+The `getHighestY()` function iterates through all the balls to return the highest `ball.y` value. It makes use of `Array.reduce()` like so:
+
+```js
+export function getHighestY(balls) {
+  return balls.reduce((maxY, ball) => {
+    return ball.y > maxY ? ball.y : maxY;
+  }, -Infinity);
+}
+```
+
+<br>
+
+## References
+
+- [p5.js Documentation](https://p5js.org/reference/) was used heavily.
+
+- The `BrickFactory()`, `BallFactory()`, `generateRandomWords()` and `getHighestY()` functions were referenced from the internet.
+
+- GPT-4 was used for some functions and simplify using syntax-sugar.

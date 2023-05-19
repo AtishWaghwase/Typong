@@ -68,6 +68,7 @@ export function explodeBall(x, y, w, h, game) {
   let transparency = map(game.explosionSize, 0, w * 2, 255, 0);
   fill(200, 100, 100, transparency);
   circle(x, y, game.explosionSize);
+
   game.explosionSize += 50;
   if (game.explosionSize > w * 3) {
     game.explosionSize = 0;
