@@ -24,9 +24,34 @@ The goal of the game is to score the maximum amount of points by continually spa
 
 ## Overview
 
-The game is built using [P5.JS](https://p5js.org/get-started/) and [Vite](https://vitejs.dev/) using the [template](https://github.com/makinteract/p5js-vite) provided by MAKInteract Lab. It uses the [random-words](https://www.npmjs.com/package/random-words) npm package to generate random five-letter words. The main code is contained in `game.js` while the supporting functions are organised into three files, viz. `physics.js`, `draw.js` and `utilities.js`.
+The game is built using [P5.JS](https://p5js.org/get-started/) and [Vite](https://vitejs.dev/) using the [template](https://github.com/makinteract/p5js-vite) provided by MAKInteract Lab. It uses the [random-words](https://www.npmjs.com/package/random-words) npm package to generate random five-letter words. The main code is contained in `game.js` while the supporting functions are organised into three files, viz. `physics.js`, `draw.js` and `utilities.js`. 
 
-### Game.js
+It uses factories to generate bricks and balls like so:
+
+```js
+export function BallFactory() {
+  this.createBall = function (x, y, xSpeed, ySpeed) {
+    let ball = {};
+    ball.x = x;
+    ball.y = y;
+    ball.xSpeed = xSpeed;
+    ball.ySpeed = ySpeed;
+    return ball;
+  };
+}
+
+export function BrickFactory() {
+  this.createBrick = function (i, state, word) {
+    let brick = {};
+    brick.index = i;
+    brick.solid = state;
+    brick.word = word;
+    return brick;
+  };
+}
+```
+
+
 
 <br>
 

@@ -1,3 +1,4 @@
+import { newGame } from "./game";
 import { getHighestY } from "./utilities";
 
 export function drawBackground(h, balls, backgroundColor) {
@@ -63,7 +64,7 @@ export function drawBall(ball, BALL_RADIUS, h, brickHeight) {
   circle(ball.x, ball.y, BALL_RADIUS * 2);
 }
 
-export function explodeBall(x, y, w, game) {
+export function explodeBall(x, y, w, h, game) {
   let transparency = map(game.explosionSize, 0, w * 2, 255, 0);
   fill(200, 100, 100, transparency);
   circle(x, y, game.explosionSize);
@@ -71,6 +72,7 @@ export function explodeBall(x, y, w, game) {
   if (game.explosionSize > w * 3) {
     game.explosionSize = 0;
     game.explosion = false;
+    newGame(w, h);
   }
 }
 

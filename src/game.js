@@ -1,9 +1,11 @@
+// Import necessary modules and files
 import "../css/style.css";
 import { sketch } from "p5js-wrapper";
 import { BallFactory, BrickFactory, giveSpeed, reduceSpeed, spawnBall, checkBorderCollision, checkBrickCollision, activateBrick } from "./physics";
 import { generateRandomWords, checkWord } from "./utilities";
 import { drawBall, drawBrick, drawInput, drawScore, drawLoadscreen, drawBackground, explodeBall } from "./draw";
 
+// Declare global variables
 let scoreHeight, brickHeight, backgroundColor;
 let ySpeed = 7;
 
@@ -29,24 +31,27 @@ let game = {
   explosionSize: 0,
 };
 
+// Define function to start a new game
 export function newGame(w, h) {
   game.input = "";
   game.collisionCounter = 0;
   balls = [];
   bricks = [];
 
+  // Create a new ball and add it to the balls array
   let factory = new BallFactory();
   let newBall = factory.createBall(w / 2, h / 2, Math.random() * 5, -ySpeed);
   balls.push(newBall);
 
+  // Generate random words for the bricks and create new bricks
   dictionary = generateRandomWords(TOTAL_BRICKS);
-
   for (let index = 0; index < TOTAL_BRICKS; index++) {
     const brickFactory = new BrickFactory();
     bricks.push(brickFactory.createBrick(index, true, `${dictionary[index]}`));
   }
 }
 
+// Set up the canvas and initialize the game
 sketch.setup = function () {
   const w = windowWidth;
   const h = windowHeight;
@@ -56,6 +61,7 @@ sketch.setup = function () {
   newGame(w, h);
 };
 
+// Draw the game elements on the canvas
 sketch.draw = function () {
   const w = windowWidth;
   const h = windowHeight;
@@ -93,9 +99,10 @@ sketch.draw = function () {
     }
   }
 
-  if (game.explosion) explodeBall(game.lastBallX, game.lastBallY, w, game);
+  if (game.explosion) explodeBall(game.lastBallX, game.lastBallY, w, h, game);
 };
 
+// Handle keyboard input
 sketch.keyPressed = function () {
   if (game.running) {
     if (keyCode === BACKSPACE) {
@@ -107,19 +114,23 @@ sketch.keyPressed = function () {
       if (checkWord(game.input, dictionary)) {
         activateBrick(game.input, bricks);
       }
-      game.input = "";
+      setTimeout(() => {
+        game.input = "";
+      }, 100);
     } else if (key.length === 1) {
       game.input += key.toUpperCase();
     }
   }
 };
 
+// Handle mouse input
 sketch.mousePressed = function () {
   const w = windowWidth;
   const h = windowHeight;
   game.running ? (newGame(w, h), (game.running = false)) : ((game.running = true), (game.scoreCounter = 0));
 };
 
+// Handle window resizing
 sketch.windowResized = function () {
   resizeCanvas(windowWidth, windowHeight);
 };
