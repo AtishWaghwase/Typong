@@ -1,6 +1,6 @@
 # **Typong** : Pong Breaker Using Keyboard Input
 
-- **Links:** [GitHub](https://github.com/AtishWaghwase/Typong), [YouTube](https://youtu.be/-b6wISvl8Wk)
+- **Links:** **[Play Typong](https://typong.netlify.app/)**, [GitHub](https://github.com/AtishWaghwase/Typong), [YouTube](https://youtu.be/-b6wISvl8Wk)
 
 - **Name:** Atish Waghwase
 
